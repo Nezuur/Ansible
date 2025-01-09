@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - { role: common, tags: [common] }
+    - { role: firewall_base, tags: [firewall_base] }
+    - { role: sshd, tags: [sshd] }
