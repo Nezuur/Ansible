@@ -1,0 +1,63 @@
+---
+- name: Allow SSH
+  iptables:
+    action: insert
+    chain: INPUT
+    protocol: tcp
+    destination_port: '22'
+    jump: ACCEPT
+    comment: SSH
+  notify: save iptables
+
+- name: Allow ICMP
+  iptables:
+    action: insert
+    chain: INPUT
+    jump: ACCEPT
+    protocol: icmp
+    comment: icmp
+  notify: save iptables
+
+- name: Allow traffic from lo
+  iptables:
+    action: insert
+    chain: INPUT
+    jump: ACCEPT
+    in_interface: lo
+    comment: LO
+  notify: save iptables
+
+- name: Allow traffic from lo (ipv6)
+  iptables:
+    action: insert
+    chain: INPUT
+    jump: ACCEPT
+    in_interface: lo
+    comment: LO
+    ip_version: ipv6
+  notify: save iptables6
+
+- name: Allow established traffic
+  iptables:
+    action: insert
+    chain: INPUT
+    jump: ACCEPT
+    ctstate: RELATED,ESTABLISHED
+    comment: Established
+  notify: save iptables
+
+- name: Set policy for iptables to DROP
+  iptables:
+    policy: DROP
+    chain: INPUT
+  notify: save iptables
+
+- name: Set policy for iptables to DROP (ipv6)
+  iptables:
+    policy: DROP
+    chain: INPUT
+    ip_version: ipv6
+  notify: save iptables6
+
+- name: Save firewall
+  meta: flush_handlers
