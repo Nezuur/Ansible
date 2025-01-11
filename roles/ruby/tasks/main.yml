@@ -1,0 +1,55 @@
+---
+- name: Fetch current version
+  shell: "cat {{ ruby.rbenv_root }}/version"
+  register: fetch_global
+  changed_when: false
+  failed_when: false
+  tags: ruby
+
+- name: Set global variables
+  set_fact:
+    current_global: "{{ fetch_global.stdout }}"
+    env_path: "{{ ruby.rbenv_root }}/bin:{{ ruby.rbenv_root }}/shims:{{ ruby.rbenv_plugins }}/ruby-build/bin:{{ ansible_env.PATH }}"
+  tags: ruby
+
+- name: Install ruby
+  command: "rbenv install {{ item }}"
+  args:
+    creates: "{{ ruby.rbenv_root }}/versions/{{ item }}/bin/ruby"
+  environment:
+    CONFIGURE_OPTS: --disable-install-doc
+    PATH: "{{ env_path }}"
+  with_items: "{{ ruby.versions }}"
+  tags: ruby
+
+- name: Set {{ ruby.global }} as global version
+  command: "rbenv global {{ ruby.global }}"
+  environment:
+    PATH: "{{ env_path }}"
+  when: current_global != ruby.global
+  tags: ruby
+
+- name: Create temporary ruby directories
+  file:
+    dest: "/tmp/rubies/{{ item }}"
+    state: directory
+  with_items: "{{ ruby.versions }}"
+  tags: bundler
+
+- name: Setup local ruby versions
+  template:
+    src: ruby-version.j2
+    dest: "/tmp/rubies/{{ item }}/.ruby-version"
+  with_items: "{{ ruby.versions }}"
+  tags: bundler
+
+- name: Install bundler
+  command: "gem install bundler -v {{ ruby.bundler }}"
+  args:
+    chdir: "/tmp/rubies/{{ item }}"
+  environment:
+    PATH: "{{ env_path }}"
+  with_items: "{{ ruby.versions }}"
+  notify: rbenv rehash
+  check_mode: false
+  tags: bundler

@@ -1,0 +1,69 @@
+---
+- name: Install dependencies
+  become_user: root
+  apt:
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    name:
+      - zlib1g-dev
+      - build-essential
+      - libssl-dev
+      - libreadline-dev
+      - libyaml-dev
+      - libxml2-dev
+      - libxslt1-dev
+      - libcurl4-openssl-dev
+      - libffi-dev
+      - libpq-dev
+      - dirmngr
+      - gnupg
+      - apt-transport-https
+      - ca-certificates
+  tags: rbenv
+
+- name: Clone rbenv repository
+  git:
+    repo: https://github.com/rbenv/rbenv.git
+    dest: "{{ ruby.rbenv_root }}"
+    update: false
+    version: "{{ ruby.rbenv_version | default('master') }}"
+  tags: rbenv
+
+- name: Clone ruby-build repository
+  git:
+    repo: https://github.com/rbenv/ruby-build.git
+    dest: "{{ ruby.rbenv_plugins }}/ruby-build"
+    update: false
+  tags: rbenv
+
+- name: Clone rbenv-vars repository
+  git:
+    repo: https://github.com/rbenv/rbenv-vars.git
+    dest: "{{ ruby.rbenv_plugins }}/rbenv-vars"
+    update: false
+  tags: rbenv
+
+- name: Export rbenv to bash
+  lineinfile:
+    dest: "/home/{{ app_user }}/.profile"
+    regexp: ^export PATH="$HOME/.rbenv/bin
+    line: export PATH="$HOME/.rbenv/bin:$PATH"
+  notify: bash reload
+  tags: rbenv
+
+- name: Concatenate rbenv arguments
+  lineinfile:
+    dest: "/home/{{ app_user }}/.profile"
+    regexp: ^eval "$\(rbenv
+    line: eval "$(rbenv init -)"
+  notify: bash reload
+  tags: rbenv
+
+- name: Export rbenv plugins to bash
+  lineinfile:
+    dest: "/home/{{ app_user }}/.profile"
+    regexp: ^export PATH="$HOME/.rbenv/plugins
+    line: export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+  notify: bash reload
+  tags: rbenv

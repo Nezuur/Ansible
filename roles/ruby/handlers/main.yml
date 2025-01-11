@@ -1,0 +1,5 @@
+---
+- name: rbenv rehash
+  command: rbenv rehash
+  environment:
+    PATH: "{{ env_path }}"
