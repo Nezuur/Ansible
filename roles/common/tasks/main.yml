@@ -1,0 +1,59 @@
+---
+- name: Set resolv.conf
+  copy:
+    dest: /etc/resolv.conf
+    content: "nameserver 127.0.0.1\nnameserver 8.8.8.8\nnameserver 8.8.4.4\n"
+
+- name: Install common packages
+  apt:
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    name:
+      - apt-transport-https
+      - build-essential
+      - curl
+      - git
+      - htop
+      - iotop
+      - iperf
+      - iptables-persistent
+      - mc
+      - mtr-tiny
+      - screen
+      - sudo
+      - tcpdump
+      - vim
+      - python-apt
+      - net-tools
+      - tig
+      - lsof
+      - unzip
+
+- name: Set timezone
+  timezone:
+    name: Etc/UTC
+
+- name: Add ssh keys for root
+  authorized_key:
+    user: root
+    key: "{{ item }}"
+  with_items: "{{ team_ssh_keys }}"
+  tags: ssh-keys
+
+- name: Add bash alias
+  lineinfile:
+    dest: /etc/bash.bashrc
+    regexp: ^alias ll='ls -al --color'
+    line: alias ll='ls -al --color'
+
+- name: Set default editor
+  copy:
+    dest: /etc/profile.d/editor.sh
+    content: export EDITOR=vim
+
+- name: Fix locale setup
+  lineinfile:
+    dest: /etc/default/locale
+    regexp: ^LC_ALL
+    line: LC_ALL="en_US.UTF-8"

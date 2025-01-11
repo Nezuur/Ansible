@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  become_user: "{{ app_user }}"
+  roles:
+    - { role: rbenv, tags: [rbenv] }
+    - { role: ruby, tags: [ruby] }
