@@ -1,0 +1,4 @@
+---
+python_ver: 3.9.17
+python_minor: "{{ python_ver.split('.')[0] }}.{{ python_ver.split('.')[1] }}"
+python_install_dir: "/opt/python{{ python_minor }}"

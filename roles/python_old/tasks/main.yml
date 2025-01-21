@@ -1,0 +1,109 @@
+---
+- name: Setting archive facts
+  set_fact:
+    python_archive: "Python-{{ python_ver }}.tar.xz"
+
+- name: Setting host facts
+  set_fact:
+    python_url: "https://www.python.org/ftp/python/{{ python_ver }}/{{ python_archive }}"
+    python_src_dir: "/tmp/python{{ python_ver }}"
+
+- name: Install dependencies
+  apt:
+    name:
+      - libbz2-dev
+      - gcc
+      - libgdbm-dev
+      - libdb-dev
+      - libffi-dev
+      - uuid-dev
+      - make
+      - libncurses-dev
+      - libssl-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - tar
+      - tcl-dev
+      - tk-dev
+      - libxv-dev
+      - liblzma-dev
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  tags: prepare
+
+- name: Create source directory
+  file:
+    path: "{{ python_src_dir }}"
+    mode: '0755'
+    state: directory
+  tags: python-install
+
+- name: Download the source archive
+  get_url:
+    url: "{{ python_url }}"
+    dest: "{{ python_src_dir }}"
+    mode: '0644'
+  tags: python-install
+
+- name: Unpack the Python source archive
+  unarchive:
+    src: "{{ python_src_dir }}/{{ python_archive }}"
+    dest: "{{ python_src_dir }}"
+    mode: '0755'
+    remote_src: true
+  tags: python-install
+
+- name: Create target directory
+  file:
+    path: "{{ python_install_dir }}"
+    mode: '0755'
+    state: directory
+  tags: python-install
+
+- name: Run configure
+  command: >
+    ./configure --prefix="{{ python_install_dir }}"
+    chdir={{ python_src_dir }}/Python-{{ python_ver }}
+  register: configure_result
+  tags: python-install
+
+- name: Run make
+  community.general.system.make:
+    chdir: "{{ python_src_dir }}/Python-{{ python_ver }}"
+  register: make_result
+  when: configure_result is not skipped
+  tags: python-install
+
+- name: Run make install
+  community.general.system.make:
+    chdir: "{{ python_src_dir }}/Python-{{ python_ver }}"
+    target: install
+  when: make_result is not skipped
+  tags: python-install
+
+- name: Create a symbolic link
+  file:
+    src: "{{ python_install_dir }}/bin/python{{ python_minor }}"
+    dest: "/usr/bin/python{{ python_minor }}"
+    state: link
+    force: true
+  tags: python-install
+
+- name: Install Pip utitlities
+  become: true
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  with_items:
+    - python3-distutils
+    - python3-pip
+  tags: python-pip
+
+- name: Delete src directory
+  file:
+    path: "{{ python_src_dir }}"
+    state: absent
+  tags: python-install
