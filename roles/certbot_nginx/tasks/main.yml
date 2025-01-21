@@ -1,0 +1,49 @@
+---
+- name: Install Python virtualenv
+  include_tasks:
+    file: python_venv.yml
+  tags: python-venv
+
+- name: Install Certbot via pip
+  include_tasks:
+    file: install_certbot.yml
+  tags: install-certbot
+
+- name: Allow nginx ports
+  iptables:
+    chain: INPUT
+    destination_port: "{{ item }}"
+    action: insert
+    comment: NGINX
+    jump: ACCEPT
+    protocol: tcp
+  loop:
+    - '443'
+    - '80'
+  notify: save iptables
+
+- name: Check if certificate already exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ web_domain }}/privkey.pem"
+  register: letsencrypt_cert
+  tags: certbot-cert
+
+- name: Get and install certificate
+  shell:
+    cmd: >
+      certbot certonly --non-interactive --agree-tos --email {{ certbot_email }}
+      --standalone -d {{ web_domain }}
+      --pre-hook "{{ venv_dir }}certbot-nginx-prehook.sh"
+      --post-hook "{{ venv_dir }}certbot-nginx-posthook.sh"
+    creates: "/etc/letsencrypt/live/{{ web_domain }}/privkey.pem"
+  when: not letsencrypt_cert.stat.exists
+  tags: certbot-cert
+
+- name: Add renew to cron
+  cron:
+    name: Certbot update nginx
+    minute: '0'
+    hour: '6'
+    day: '*/2'
+    job: certbot renew --quiet --no-autorenew --pre-hook "{{ venv_dir }}certbot-nginx-prehook.sh" --post-hook "{{ venv_dir }}certbot-nginx-posthook.sh"
+  tags: certbot-cron
