@@ -1,0 +1,9 @@
+---
+certbot_email: "{{ certbot_email }}"
+web_domain: "{{ domain_name }}"
+
+python_ver: 3.8
+venv_dir: /opt/certbot/
+pip_packages:
+  - certbot
+  - certbot-nginx

@@ -1,0 +1,32 @@
+---
+- name: Add apt repo for custom Python
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+    state: present
+  when: ansible_facts['distribution_version'] == "20.04" and python_ver != 3.8
+  tags: python-venv
+
+- name: "Install -virtualenv, -pip and -python{{ python_ver }}"
+  apt:
+    name:
+      - "python{{ python_ver }}"
+      - "python{{ python_ver }}-distutils"
+      - python3-pip
+      - virtualenv
+      - libaugeas0
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  tags: python-venv
+
+- name: Create virtualenv directory
+  file:
+    path: "{{ venv_dir }}"
+    state: directory
+  tags: python-venv
+
+- name: Ensure that virtualenv was installed
+  pip:
+    name: virtualenv
+    executable: pip3
+  tags: python-venv

@@ -1,0 +1,27 @@
+---
+- name: Install certbot packages
+  pip:
+    name: "{{ pip_packages }}"
+    virtualenv: "{{ venv_dir }}"
+    virtualenv_python: "python{{ python_ver }}"
+  tags: certbot-packets
+
+- name: Create symbolic link
+  file:
+    src: "{{ venv_dir }}bin/certbot"
+    dest: /usr/bin/certbot
+    state: link
+  failed_when: false
+  tags: certbot-packets
+
+- name: Copy certbot-nginx-prehook
+  copy:
+    src: certbot-nginx-prehook.sh
+    dest: "{{ venv_dir }}certbot-nginx-prehook.sh"
+    mode: +x
+
+- name: Copy certbot-nginx-posthook
+  copy:
+    src: certbot-nginx-posthook.sh
+    dest: "{{ venv_dir }}certbot-nginx-posthook.sh"
+    mode: +x
