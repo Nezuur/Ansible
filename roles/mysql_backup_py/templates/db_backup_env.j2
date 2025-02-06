@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+AWS_SECRET  = {{ mysql_backup.aws_secret_key }}
+AWS_BUCKET  = {{ mysql_backup.bucket_name }}
+AWS_REGION  = {{ mysql_backup.aws_region }}
+AWS_SECKEY  = {{ mysql_backup.aws_access_key }}
+S3_FOLDER   = {{ mysql_backup.s3_folder }}
+MYSQL_PASS  = {{ mysql_backup.mysql_password }}
+MYSQL_USER  = {{ mysql_backup.mysql_user }}
