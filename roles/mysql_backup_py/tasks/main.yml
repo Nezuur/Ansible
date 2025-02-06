@@ -1,0 +1,60 @@
+---
+- name: Install virtualenv, python and pip
+  apt:
+    pkg:
+      - python3-pip
+      - "python{{ python_version }}"
+      - "python{{ python_version }}-venv"
+      - "python{{ python_version }}-distutils"
+    update_cache: true
+    state: present
+    cache_valid_time: 3600
+
+- name: Create virtual environment directory
+  file:
+    path: "{{ percona_venv }}"
+    state: directory
+
+- name: Create virtual environment
+  command: python"{{ python_version }}" -m venv --system-site-packages "{{ percona_venv }}"
+  args:
+    creates: "{{ percona_venv }}/bin/activate"
+  changed_when: false
+  tags: python-venv
+
+- name: Install python requirements
+  pip:
+    name: "{{ pip_packages }}"
+    virtualenv: "{{ percona_venv }}"
+    virtualenv_python: python"{{ python_version }}"
+  tags: python-venv
+
+- name: Copy backup script
+  copy:
+    src: db_backup.py
+    dest: /opt/db_backup.py
+    mode: '0755'
+
+- name: Copy backup env
+  template:
+    src: db_backup_env.j2
+    dest: /etc/zabbix/scripts/db_backup.env
+    mode: '0644'
+
+- name: Creates MySQL backup Cron job
+  cron:
+    name: MySQL backup to S3
+    day: '*'
+    hour: "{{ mysql_backup.hour }}"
+    minute: 0
+    job: "{{ percona_venv }}bin/python{{ python_version }} /opt/db_backup.py \
+      --retention={{ mysql_backup.retention }} \
+      --databases={{ mysql_backup.databases | join(',') }} \
+      --path={{ mysql_backup.path }} 2>&1"
+    state: present
+    disabled: false
+
+- name: Create dir for backups
+  file:
+    path: "{{ mysql_backup.path }}"
+    state: directory
