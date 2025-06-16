@@ -4,6 +4,10 @@
     name: sshd
     state: restarted
 
+- name: daemon-reload
+  systemd:
+    daemon_reload: true
+
 - name: save iptables
   community.general.iptables_state:
     ip_version: ipv4
