@@ -7,6 +7,18 @@
     destination_port: "22"
     jump: ACCEPT
     comment: SSH
+  when: custom_ssh_port is not defined
+  notify: save iptables
+
+- name: "Allow SSH on port {{ custom_ssh_port }}"
+  iptables:
+    action: insert
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ custom_ssh_port }}"
+    jump: ACCEPT
+    comment: SSH
+  when: custom_ssh_port is defined
   notify: save iptables
 
 - name: Allow ICMP
