@@ -14,8 +14,8 @@
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
     backup: true
-    owner: '0'
-    group: '0'
-    mode: '0644'
+    owner: "0"
+    group: "0"
+    mode: "0644"
     validate: /usr/sbin/sshd -T -f %s
   notify: restart sshd

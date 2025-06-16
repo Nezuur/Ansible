@@ -3,7 +3,7 @@ ipfy_api_url: https://api.ipify.org/
 
 percona_venv: /var/lib/mysql_backup/venv/
 
-python_version: '3.8'
+python_version: "3.8"
 
 pip_packages:
   - boto
@@ -20,12 +20,12 @@ mysql_backup:
   retention: 5
   databases:
     - default
-  aws_access_key: ''
-  aws_secret_key: ''
-  bucket_name: ''
-  aws_region: ''
-  s3_folder: ''
+  aws_access_key: ""
+  aws_secret_key: ""
+  bucket_name: ""
+  aws_region: ""
+  s3_folder: ""
   path: /var/lib/mysql_backup
   hour: 1
   mysql_user: root
-  mysql_password: ''
+  mysql_password: ""

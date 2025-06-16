@@ -3,7 +3,7 @@
   copy:
     src: backup.py
     dest: /opt/backup.py
-    mode: '0755'
+    mode: "0755"
 
 - name: Cron backup task in the first day of month
   cron:

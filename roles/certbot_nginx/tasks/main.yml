@@ -18,8 +18,8 @@
     jump: ACCEPT
     protocol: tcp
   loop:
-    - '443'
-    - '80'
+    - "443"
+    - "80"
   notify: save iptables
 
 - name: Check if certificate already exists
@@ -42,8 +42,8 @@
 - name: Add renew to cron
   cron:
     name: Certbot update nginx
-    minute: '0'
-    hour: '6'
-    day: '*/2'
-    job: certbot renew --quiet --no-autorenew --pre-hook "{{ venv_dir }}certbot-nginx-prehook.sh" --post-hook "{{ venv_dir }}certbot-nginx-posthook.sh"
+    minute: "0"
+    hour: "6"
+    day: "*/2"
+    job: "certbot renew --quiet --no-autorenew --pre-hook {{ venv_dir }}certbot-nginx-prehook.sh --post-hook {{ venv_dir }}certbot-nginx-posthook.sh"
   tags: certbot-cron

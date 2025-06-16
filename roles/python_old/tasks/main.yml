@@ -35,7 +35,7 @@
 - name: Create source directory
   file:
     path: "{{ python_src_dir }}"
-    mode: '0755'
+    mode: "0755"
     state: directory
   tags: python-install
 
@@ -43,21 +43,21 @@
   get_url:
     url: "{{ python_url }}"
     dest: "{{ python_src_dir }}"
-    mode: '0644'
+    mode: "0644"
   tags: python-install
 
 - name: Unpack the Python source archive
   unarchive:
     src: "{{ python_src_dir }}/{{ python_archive }}"
     dest: "{{ python_src_dir }}"
-    mode: '0755'
+    mode: "0755"
     remote_src: true
   tags: python-install
 
 - name: Create target directory
   file:
     path: "{{ python_install_dir }}"
-    mode: '0755'
+    mode: "0755"
     state: directory
   tags: python-install
 

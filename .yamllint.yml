@@ -1,0 +1,17 @@
+---
+extends: default
+
+ignore: |
+  .github/workflows/linter.yml
+  .yamllint.yml
+
+rules:
+  line-length: { max: 250 }
+  brackets: { max-spaces-inside: 1 }
+  braces: { max-spaces-inside: 1 }
+  comments: { min-spaces-from-content: 1, level: error }
+  comments-indentation: { level: error }
+  document-start: { level: error }
+  truthy: { level: error }
+  quoted-strings: { level: error, required: only-when-needed, quote-type: double, extra-required: ['{{'] }
+  octal-values: { level: error, forbid-implicit-octal: true, forbid-explicit-octal: true }
