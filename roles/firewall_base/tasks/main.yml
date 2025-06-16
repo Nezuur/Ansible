@@ -4,7 +4,7 @@
     action: insert
     chain: INPUT
     protocol: tcp
-    destination_port: '22'
+    destination_port: "22"
     jump: ACCEPT
     comment: SSH
   notify: save iptables

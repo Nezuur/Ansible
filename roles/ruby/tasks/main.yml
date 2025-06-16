@@ -22,7 +22,7 @@
   with_items: "{{ ruby.versions }}"
   tags: ruby
 
-- name: Set {{ ruby.global }} as global version
+- name: "Set {{ ruby.global }} as global version"
   command: "rbenv global {{ ruby.global }}"
   environment:
     PATH: "{{ env_path }}"
