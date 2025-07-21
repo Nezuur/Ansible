@@ -1,0 +1,29 @@
+---
+- name: Install aws CLI
+  apt:
+    name: awscli
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Create backup dir
+  file:
+    path: "{{ pg_backups_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: Create backup script
+  template:
+    src: pg-backup.sh.j2
+    dest: /usr/local/bin/pg-backup
+    mode: "0700"
+    owner: root
+    group: root
+
+- name: Crontab task for backup
+  cron:
+    name: PostgreSQL backup
+    hour: "{{ pg_backups_time_hour }}"
+    minute: 0
+    job: /usr/local/bin/pg-backup
+  when: pg_backups_time_hour is defined
