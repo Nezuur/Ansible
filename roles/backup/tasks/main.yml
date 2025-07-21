@@ -13,6 +13,6 @@
     day: 1
     hour: 5
     minute: 0
-    job: "python3 /opt/backup.py --source={{ backup_path }} --destination={{ dest_path }} 2>&1"
+    job: "python3 /opt/backup.py --source={{ src_path }} --destination={{ dest_path }} 2>&1"
     disabled: false
     state: present
