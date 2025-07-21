@@ -1,0 +1,13 @@
+---
+db_name_1: foo
+db_name_2: bar
+
+# Cron
+pg_backups_dir: /usr/lib/pg-backups
+pg_backups_time_hour: "05"
+
+# AWS
+pg_backups_aws_key: ""
+pg_backups_aws_secret: ""
+pg_backups_aws_bucket: ""
+pg_backups_aws_region: ""
