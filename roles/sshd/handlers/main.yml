@@ -1,12 +1,8 @@
 ---
 - name: restart sshd
   service:
-    name: sshd
+    name: "{{ 'ssh.socket' if ansible_distribution_version == '24.04' else 'sshd' }}"
     state: restarted
-
-- name: daemon-reload
-  systemd:
-    daemon_reload: true
 
 - name: save iptables
   community.general.iptables_state:

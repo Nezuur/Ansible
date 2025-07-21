@@ -1,0 +1,27 @@
+#!/bin/bash
+
+DATE=`date "+%Y-%m-%d"`
+
+BACKUP_BASES=({{ db_name_1 }} {{ db_name_2 }})
+
+export AWS_ACCESS_KEY_ID="{{ pg_backups_aws_key }}"
+export AWS_SECRET_ACCESS_KEY="{{ pg_backups_aws_secret }}"
+export AWS_DEFAULT_REGION="{{ pg_backups_aws_region }}"
+
+BUCKET="s3://{{ pg_backups_aws_bucket }}"
+DIR="{{ pg_backups_dir }}"
+
+for item in ${BACKUP_BASES[*]}
+do
+    sudo -u postgres pg_dump $item -O -F c > "$DIR/$DATE-$item.dump"
+    /usr/bin/aws s3 cp $DIR/$DATE-$item.dump ${BUCKET}/postgresql/
+    current_day=`date +%d`
+    if [ "$current_day" == "01" ]; then
+	    tag='{"TagSet": [{ "Key": "RetentionPolicy", "Value": "KeepAlways" }]}'
+    else
+	    tag='{"TagSet": [{ "Key": "RetentionPolicy", "Value": "Keep32" }]}'
+    fi
+    /usr/bin/aws s3api put-object-tagging --bucket {{ pg_backups_aws_bucket }} --key postgresql/$DATE-$item.dump --tagging "$tag"
+done
+
+find {{ pg_backups_dir }} -type f -name '*.dump' -mmin +720 -exec rm {} \;
