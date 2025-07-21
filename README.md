@@ -15,6 +15,7 @@ This repository contains a collection of Ansible roles and playbooks for managin
   - [Python from sources](#python-from-sources)
   - [Rbenv](#rbenv)
   - [Ruby](#ruby)
+  - [PostgreSQL Backup with Bash](#postgresql-backup-with-bash)
 
 ## Common
 
@@ -51,3 +52,7 @@ This role installs and manages rbenv and its plugins on a system. It handles the
 ## Ruby
 
 This Ansible role manages the installation and configuration of Ruby using rbenv. It allows you to specify multiple Ruby versions to be installed, set a global Ruby version, and manage Ruby gems with Bundler.
+
+## PostgreSQL Backup with Bash
+
+This Ansible role automates the backup of PostgreSQL databases to an AWS S3 bucket. It installs necessary tools, manages a backup script, and schedules it via a cron job and a bash script.
