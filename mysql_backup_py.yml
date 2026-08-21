@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - role: mysql_backup_py
+      tags: [mysql_backup_py]
+  vars:
+    mysql_backup:
+      retention: 5
+      databases:
+        - default
+      aws_access_key: ""
+      aws_secret_key: ""
+      bucket_name: ""
+      aws_region: ""
+      s3_folder: mysql_backup
+      path: /var/lib/mysql_backup
+      hour: 1
+      mysql_user: root
+      mysql_password: ""
+    db_backup_env_dest: /opt/db_backup.env

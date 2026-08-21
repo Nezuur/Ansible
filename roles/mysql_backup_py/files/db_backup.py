@@ -22,7 +22,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-env = dotenv_values("/etc/zabbix/scripts/db_backup.env")
+env = dotenv_values(os.environ.get("DB_BACKUP_ENV", "/etc/zabbix/scripts/db_backup.env"))
 AWS_SECRET = env['AWS_SECRET']
 AWS_BUCKET = env['AWS_BUCKET']
 AWS_REGION = env['AWS_REGION']

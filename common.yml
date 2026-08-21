@@ -1,7 +1,13 @@
 ---
+# Set once here; both firewall_base and sshd consume sshd_custom_port.
 - hosts: all
   become: true
+  vars:
+    sshd_custom_port: 2200
   roles:
-    - { role: common, tags: [common] }
-    - { role: firewall_base, tags: [firewall_base] }
-    - { role: sshd, tags: [sshd] }
+    - role: common
+      tags: [common]
+    - role: firewall_base
+      tags: [firewall_base]
+    - role: sshd
+      tags: [sshd]

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  vars:
+    certbot_email: ""
+    domain_name: example.com
+  roles:
+    - role: certbot_nginx
+      tags: [certbot_nginx]

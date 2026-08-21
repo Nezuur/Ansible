@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+  vars:
+    python_ver: 3.9.17
+  roles:
+    - role: python_old
+      tags: [python_old]

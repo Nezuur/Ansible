@@ -1,2 +1,2 @@
 ---
-custom_ssh_port: 2200
+# sshd_custom_port — set in the playbook (see common.yml). No role default.

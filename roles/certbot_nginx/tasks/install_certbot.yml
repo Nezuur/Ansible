@@ -18,10 +18,10 @@
   copy:
     src: certbot-nginx-prehook.sh
     dest: "{{ venv_dir }}certbot-nginx-prehook.sh"
-    mode: +x
+    mode: "0755"
 
 - name: Copy certbot-nginx-posthook
   copy:
     src: certbot-nginx-posthook.sh
     dest: "{{ venv_dir }}certbot-nginx-posthook.sh"
-    mode: +x
+    mode: "0755"
