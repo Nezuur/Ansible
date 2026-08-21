@@ -1,38 +1,48 @@
-# Ansible Role: PostgreSQL Backup shell
+# Ansible Role: pg_backup_sh
 
-This Ansible role automates the backup of PostgreSQL databases to an AWS S3 bucket. It installs necessary tools, manages a backup script, and schedules it via a cron job and a bash script.
+Shell-based PostgreSQL backup to AWS S3 using `pg_dump` and the AWS CLI. Scheduled via cron.
+
+For the Python/boto3 alternative, see `pg_backup_py`. Use `pg_backup.yml` with `pg_backup_method=sh`.
 
 ## Role Variables
 
-Define these variables in your playbook or inventory to customize the behavior of the role:
+Defined in `defaults/main.yml`:
 
-- `pg_backups_dir`: Directory where backups are temporarily stored before uploading. Default is `/usr/lib/pg-backups`
-- `pg_backups_time_hour`: Hour at which the backup cron job will run. Default is `"05"`
-- `pg_backups_aws_key`: AWS Access Key ID for accessing S3
-- `pg_backups_aws_secret`: AWS Secret Access Key for accessing S3
-- `pg_backups_aws_bucket`: Name of the S3 bucket for backup storage
-- `pg_backups_aws_region`: AWS region where the S3 bucket is located. Default is `eu-central-1`
+- `db_name_1` / `db_name_2`: Databases to dump. Defaults `foo` / `bar`.
+- `pg_backups_dir`: Local staging directory. Default `/usr/lib/pg_backups`.
+- `pg_backups_time_hour`: Cron hour. Default `"05"`.
+- `pg_backups_aws_key`: AWS access key ID.
+- `pg_backups_aws_secret`: AWS secret access key.
+- `pg_backups_aws_bucket`: S3 bucket name.
+- `pg_backups_aws_region`: AWS region.
 
-## Setup
+## Behaviour
 
-1. Ensure AWS credentials are securely set either in the playbook or by configuring your environment to use IAM roles.
-2. Populate necessary variables as described above. Ensure they are defined in your Ansible inventory or playbook.
+1. Installs `awscli`
+2. Deploys `/usr/local/bin/pg_backup` from `templates/pg_backup.sh.j2`
+3. Dumps databases as custom-format `.dump` files
+4. Uploads to `s3://<bucket>/postgresql/`
+5. Tags objects (`KeepAlways` on day 1, else `Keep32`)
+6. Deletes local `.dump` files older than 12 hours
 
 ## Usage
 
-- This role installs the AWS CLI if necessary, creates a backup script from the template, and configures a cron job to run the script daily at the specified hour.
-- Backups are stored in the specified S3 bucket, and the local copies are deleted after 12 hours by default to save space.
+```yaml
+- hosts: db
+  become: true
+  roles:
+    - role: pg_backup_sh
+  vars:
+    db_name_1: app_production
+    db_name_2: app_analytics
+    pg_backups_aws_key: "{{ vault_aws_access_key }}"
+    pg_backups_aws_secret: "{{ vault_aws_secret_key }}"
+    pg_backups_aws_bucket: my-pg-backups
+    pg_backups_aws_region: eu-central-1
+```
 
-## Backup Script
+Or via the combined playbook:
 
-The backup script performs the following:
-
-1. Dumps specified PostgreSQL databases to the local filesystem
-2. Uploads the dump files to an S3 bucket
-3. Tags the S3 objects for retention based on the day of the month
-4. Cleans up old local dump files
-
-## Security Considerations
-
-- Avoid hardcoding AWS credentials in variables
-- Review the cron job schedule
+```bash
+ansible-playbook -i inventory/hosts.yml pg_backup.yml -e pg_backup_method=sh
+```

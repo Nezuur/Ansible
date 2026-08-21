@@ -1,5 +1,5 @@
 ---
-certbot_email: "{{ certbot_email }}"
+certbot_email: ""
 web_domain: "{{ domain_name }}"
 
 python_ver: 3.8

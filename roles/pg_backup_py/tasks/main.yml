@@ -1,0 +1,65 @@
+---
+- name: Get public IP
+  ipify_facts:
+    validate_certs: false
+    api_url: "{{ ipfy_api_url }}"
+
+- name: Set server id
+  set_fact:
+    pg_server_id: "{{ lookup('password', 'vault/pg/{{ ipify_public_ip }}.server-id chars=digits length=6') }}"
+
+- name: Add apt repo for Python3.8
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+    state: present
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+
+- name: Install virtualenv, python3.8 and pip
+  apt:
+    pkg:
+      - python3.8
+      - python3-pip
+      - virtualenv
+      - python3.8-distutils
+    update_cache: true
+    state: present
+    cache_valid_time: 3600
+
+- name: Install deps
+  pip:
+    name: "{{ pip_packages }}"
+    virtualenv: "{{ pg_venv }}"
+    virtualenv_python: python3.8
+
+- name: Copy backup script
+  copy:
+    src: pg_db_backup.py
+    dest: /opt/pg_db_backup.py
+    mode: "0755"
+
+- name: Create .env file
+  template:
+    src: pg_backup_env.j2
+    dest: /opt/pg_backup_env
+    backup: true
+    mode: "0700"
+  tags: dotenv
+
+- name: Create dir for backups
+  file:
+    path: "{{ pg_backup.path }}"
+    state: directory
+
+- name: Creates pg backup Cron job
+  cron:
+    name: pg backup to S3
+    day: "*"
+    hour: "{{ pg_backup.hour }}"
+    minute: 0
+    job: "{{ pg_venv }}bin/python3 /opt/pg_db_backup.py \
+      --retention={{ pg_backup.retention }} \
+      --databases={{ pg_backup.databases | join(',') }} \
+      --path={{ pg_backup.path }} \
+      --pg_user=postgres 2>&1"
+    state: present
+    disabled: false

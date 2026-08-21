@@ -1,6 +1,1 @@
 ---
-- name: bash reload
-  shell: "source /home/{{ app_user }}/.profile"
-  args:
-    executable: /bin/bash
-  become: false
