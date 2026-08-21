@@ -1,6 +1,6 @@
 # Personal Ansible notes / lab roles
 
-Lab roles and playbooks I use on Ubuntu boxes. Not a framework. Copy what you need into your own inventory and set the variables for your environment.
+Lab roles and playbooks I use on Ubuntu boxes. Copy what you need into your own inventory and set the variables for your environment.
 
 ## Quick start
 
@@ -9,7 +9,7 @@ Lab roles and playbooks I use on Ubuntu boxes. Not a framework. Copy what you ne
 ansible-playbook -i inventory/hosts.yml common.yml
 ```
 
-Set shared values in the playbook `vars:` (see `common.yml` for `sshd_custom_port`), not by editing role defaults when you can avoid it.
+Set shared values in the playbook `vars:` (see `common.yml` for `sshd_custom_port`)
 
 ## Playbooks → roles
 
@@ -41,10 +41,7 @@ Set shared values in the playbook `vars:` (see `common.yml` for `sshd_custom_por
 | `certbot_nginx` | venv certbot + iptables hooks | TLS when you need an isolated certbot |
 | `python_old` | Compile CPython from source | When distro Python is too old |
 
-**SSH port:** one variable, `sshd_custom_port`, set in `common.yml`. `firewall_base` and `sshd` both read it. Do not set two different names.
+**SSH port:** one variable, `sshd_custom_port`, set in `common.yml`. `firewall_base` and `sshd` both read it. 
+Do not set two different names.
 
 **PG backups:** same job, different dump format and S3 prefix — use one method per host. See role READMEs for vars.
-
-## Not published
-
-Local-only / ignored: `strong_swan`, inventory, secrets. Do not expect them in the remote repo.
