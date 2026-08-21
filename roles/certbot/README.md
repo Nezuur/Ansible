@@ -1,25 +1,20 @@
-# Ansible Role: Certbot
+# certbot
 
-Installs Certbot with the Nginx plugin via apt and configures Let's Encrypt renewal hooks that manage iptables around certificate renewals.
+Let's Encrypt via apt's `certbot` + `python3-certbot-nginx`, standalone mode, with pre/post iptables hooks for port 80.
 
-## Role Variables
+**Playbook:** `certbot.yml`
 
-None required. The role uses the target host's `ansible_host` as the certificate domain and `root@{{ ansible_host }}` as the Let's Encrypt email.
+## Vars
 
-## Tasks
+None — uses `ansible_host` as both the domain and the `--email` (`root@<ansible_host>`).
 
-1. Install `certbot` and `python3-certbot-nginx`.
-2. Create `/etc/letsencrypt/renewal-hooks/{pre,post}/` directories.
-3. Deploy pre- and post-renewal hook scripts.
-4. Obtain an SSL certificate for `ansible_host` via the Nginx plugin.
+## What it does
 
-## Usage
+1. Installs certbot + nginx plugin
+2. Deploys pre/post renewal hooks that open/close port 80
+3. Issues the cert (`certonly --standalone`) if it doesn't already exist
+4. Crons `certbot renew` every 2 days
 
-```yaml
-- hosts: web
-  become: true
-  roles:
-    - role: certbot
-```
+## Note
 
-For a virtualenv-based Certbot install with explicit email and domain, use the `certbot_nginx` role instead.
+Ships the same `certbot-nginx-{pre,post}hook.sh` files as `certbot_nginx` — pick one role, not both, per host.

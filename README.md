@@ -5,6 +5,7 @@ Lab roles and playbooks I use on Ubuntu boxes. Copy what you need into your own 
 ## Quick start
 
 ```bash
+ansible-galaxy collection install -r requirements.yml
 # inventory is local / gitignored — create inventory/hosts.yml yourself
 ansible-playbook -i inventory/hosts.yml common.yml
 ```
@@ -41,7 +42,8 @@ Set shared values in the playbook `vars:` (see `common.yml` for `sshd_custom_por
 | `certbot_nginx` | venv certbot + iptables hooks | TLS when you need an isolated certbot |
 | `python_old` | Compile CPython from source | When distro Python is too old |
 
-**SSH port:** one variable, `sshd_custom_port`, set in `common.yml`. `firewall_base` and `sshd` both read it. 
-Do not set two different names.
+**SSH port:** one variable, `sshd_custom_port`, set in `common.yml`. `firewall_base` and `sshd` both read it. Do not set two different names.
 
 **PG backups:** same job, different dump format and S3 prefix — use one method per host. See role READMEs for vars.
+
+**Collections:** `firewall_base`, `sshd`, `certbot`, `certbot_nginx`, `pg_backup_py`, `python_old` need `community.general` (iptables, ipify_facts, make). Covered by `requirements.yml`.

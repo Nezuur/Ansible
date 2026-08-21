@@ -69,14 +69,14 @@
   tags: python-install
 
 - name: Run make
-  community.general.system.make:
+  community.general.make:
     chdir: "{{ python_src_dir }}/Python-{{ python_ver }}"
   register: make_result
   when: configure_result is not skipped
   tags: python-install
 
 - name: Run make install
-  community.general.system.make:
+  community.general.make:
     chdir: "{{ python_src_dir }}/Python-{{ python_ver }}"
     target: install
   when: make_result is not skipped

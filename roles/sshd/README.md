@@ -1,16 +1,14 @@
 # sshd
 
-Hardens SSH: custom listen port in `sshd_config`, plus Ubuntu 24.04 `ssh.socket` override.
+Moves SSH off the default port: `sshd_config` +, on Ubuntu 24.04, the `ssh.socket` override that `sshd_config`'s `Port` directive can't reach.
 
-## Variable (required)
+**Playbook:** `common.yml`
 
-- `sshd_custom_port` — set in the playbook (see `common.yml`). No role default.
+## Vars (required, no default)
+
+- `sshd_custom_port` — set in the playbook (see `common.yml`). The role asserts it's set before doing anything.
 
 ```yaml
-- hosts: all
-  become: true
-  vars:
-    sshd_custom_port: 2200
-  roles:
-    - role: sshd
+vars:
+  sshd_custom_port: 2200
 ```

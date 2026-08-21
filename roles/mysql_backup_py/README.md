@@ -1,43 +1,24 @@
-# Ansible Role: MySQL Backup
+# mysql_backup_py
 
-This Ansible role automates the process of creating and managing MySQL database backups. It sets up a Python environment on the target system, installs the necessary dependencies, and configures a script that performs the database backups. The backups are then compressed and uploaded to an AWS S3 bucket.
+Dumps MySQL/Percona databases and uploads them to S3. Runs in a Python venv, scheduled via cron.
 
-## Main Features
+**Playbook:** `mysql_backup_py.yml`
 
-Automated Backup Setup: Installs Python, virtualenv, and all required Python packages to manage the database backup process.
+## Vars (`defaults/main.yml`, override in playbook)
 
-MySQL Backup Script: Utilizes a Python script `(db_backup.py)` that handles database dumps, compressions, and uploads to S3.
+- `mysql_backup.databases` — list of DBs to dump
+- `mysql_backup.aws_access_key` / `aws_secret_key` / `bucket_name` / `aws_region` / `s3_folder`
+- `mysql_backup.mysql_user` / `mysql_password`
+- `mysql_backup.retention` — local retention in days
+- `mysql_backup.hour` — cron hour
+- `db_backup_env_dest` — where the env file with the above gets written
 
-Configurable via Variables: All significant parameters like AWS credentials, database details, backup retention, and scheduling can be configured through default variables.
+## What it does
 
-`Scheduling:` Integrates with cron to schedule backups at specified intervals, ensuring regular backup operations.
+1. Creates a venv, installs boto3 + deps
+2. Copies `db_backup.py` and renders its env file
+3. Crons the dump → S3 upload → local cleanup
 
-`Environment Configuration:` Uses a Jinja2 template to configure environment variables needed by the backup script.
+## Note
 
-## Requirements
-
-This role requires Python and several Python packages which are handled by the role itself. Ensure that the target system has internet connectivity to download necessary packages.
-
-## Example Configuration
-
-Below is an example configuration snippet from the defaults/main.yml:
-
-```yaml
-
-mysql_backup:
-  retention: 7  # days for backup retention
-  databases:
-    - mydatabase
-  aws_access_key: 'AKIAIOSFODNN7EXAMPLE'
-  aws_secret_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
-  bucket_name: 'my-bucket'
-  aws_region: 'us-west-2'
-  s3_folder: 'mydatabase_backups'
-  path: '/var/lib/mysql_backup'
-  hour: 3  # Scheduled backup hour
-  mysql_user: 'db_user'
-  mysql_password: 'db_pass'
-
-```
-
-This role is designed to simplify the management of database backups for MySQL, utilizing AWS S3 as a remote storage solution. It is not a well written program, but it is working.
+Default `db_backup_env_dest` is `/etc/zabbix/scripts/db_backup.env` — leftover from where this was originally deployed. Set it to something like `/opt/db_backup.env` if you don't run Zabbix (the playbook already does this).
