@@ -1,0 +1,35 @@
+---
+- name: Install certbot
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+
+- name: Create hooks folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0775"
+    recurse: true
+  loop:
+    - /etc/letsencrypt/renewal-hooks/post/
+    - /etc/letsencrypt/renewal-hooks/pre/
+
+- name: Copy nginx renew pre hook
+  copy:
+    src: certbot-nginx-prehook.sh
+    dest: /etc/letsencrypt/renewal-hooks/pre/certbot-nginx-prehook.sh
+    mode: "0755"
+
+- name: Copy nginx renew post hook
+  copy:
+    src: certbot-nginx-posthook.sh
+    dest: /etc/letsencrypt/renewal-hooks/post/certbot-nginx-posthook.sh
+    mode: "0755"
+
+- name: Obtain SSL main certificate with nginx
+  shell:
+    cmd: >
+      certbot --non-interactive --agree-tos --email root@{{ ansible_host }} --nginx -d {{ ansible_host }}
+  notify: reload nginx

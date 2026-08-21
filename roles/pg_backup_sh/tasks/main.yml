@@ -14,8 +14,8 @@
 
 - name: Create backup script
   template:
-    src: pg-backup.sh.j2
-    dest: /usr/local/bin/pg-backup
+    src: pg_backup.sh.j2
+    dest: /usr/local/bin/pg_backup
     mode: "0700"
     owner: root
     group: root
@@ -25,5 +25,5 @@
     name: PostgreSQL backup
     hour: "{{ pg_backups_time_hour }}"
     minute: 0
-    job: /usr/local/bin/pg-backup
+    job: /usr/local/bin/pg_backup
   when: pg_backups_time_hour is defined

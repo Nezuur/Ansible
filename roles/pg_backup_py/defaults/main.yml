@@ -1,0 +1,25 @@
+---
+ipfy_api_url: https://api.ipify.org/
+
+pg_venv: /var/lib/pg_backup/venv/
+
+pip_packages:
+  - boto
+  - boto3==1.34.33
+  - botocore
+  - jmespath
+  - python-dateutil
+  - s3transfer
+  - six
+  - urllib3==2.1.0
+  - python-dotenv
+
+bucket_name: ""
+region_name: ""
+
+pg_backup:
+  retention: 0
+  databases:
+    - template1
+  path: /var/lib/pg_backup
+  hour: 1

@@ -3,5 +3,7 @@
   become: true
   become_user: "{{ app_user }}"
   roles:
-    - { role: rbenv, tags: [rbenv] }
-    - { role: ruby, tags: [ruby] }
+    - role: rbenv
+      tags: [rbenv]
+    - role: ruby
+      tags: [ruby]

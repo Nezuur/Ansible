@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - role: backup
+      tags: [backup]
+  vars:
+    src_path: /home/user/target/
+    dest_path: /home/user/backup/

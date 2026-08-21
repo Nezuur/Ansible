@@ -29,3 +29,5 @@ mysql_backup:
   hour: 1
   mysql_user: root
   mysql_password: ""
+
+db_backup_env_dest: /etc/zabbix/scripts/db_backup.env

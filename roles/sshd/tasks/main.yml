@@ -1,4 +1,11 @@
 ---
+- name: Require sshd_custom_port
+  assert:
+    that:
+      - sshd_custom_port is defined
+      - sshd_custom_port | string | length > 0
+    fail_msg: Set sshd_custom_port in the playbook (see common.yml)
+
 - name: "Allow SSH {{ sshd_custom_port }}"
   iptables:
     action: insert
@@ -32,7 +39,7 @@
         content: |
           [Socket]
           ListenStream=
-          ListenStream={{ sshd_listen_port }}
+          ListenStream={{ sshd_custom_port }}
         dest: /etc/systemd/system/ssh.socket.d/override.conf
 
     - name: Reload systemd daemon

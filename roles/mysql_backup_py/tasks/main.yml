@@ -38,7 +38,7 @@
 - name: Copy backup env
   template:
     src: db_backup_env.j2
-    dest: /etc/zabbix/scripts/db_backup.env
+    dest: "{{ db_backup_env_dest }}"
     mode: "0644"
 
 - name: Creates MySQL backup Cron job
@@ -47,7 +47,7 @@
     day: "*"
     hour: "{{ mysql_backup.hour }}"
     minute: 0
-    job: "{{ percona_venv }}bin/python{{ python_version }} /opt/db_backup.py \
+    job: "DB_BACKUP_ENV={{ db_backup_env_dest }} {{ percona_venv }}bin/python{{ python_version }} /opt/db_backup.py \
       --retention={{ mysql_backup.retention }} \
       --databases={{ mysql_backup.databases | join(',') }} \
       --path={{ mysql_backup.path }} 2>&1"

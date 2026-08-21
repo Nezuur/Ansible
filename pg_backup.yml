@@ -1,0 +1,15 @@
+---
+# Choose one backup method: sh | py
+# Override at runtime: -e pg_backup_method=py
+# Or select by tag: --tags pg_backup_sh | --tags pg_backup_py
+- hosts: all
+  become: true
+  vars:
+    pg_backup_method: sh
+  roles:
+    - role: pg_backup_sh
+      when: pg_backup_method == "sh"
+      tags: [pg_backup_sh]
+    - role: pg_backup_py
+      when: pg_backup_method == "py"
+      tags: [pg_backup_py]

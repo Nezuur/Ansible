@@ -38,7 +38,7 @@
   authorized_key:
     user: root
     key: "{{ item }}"
-  with_items: "{{ team_ssh_keys }}"
+  loop: "{{ team_ssh_keys }}"
   tags: ssh-keys
 
 - name: Add bash alias

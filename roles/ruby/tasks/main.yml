@@ -19,7 +19,7 @@
   environment:
     CONFIGURE_OPTS: --disable-install-doc
     PATH: "{{ env_path }}"
-  with_items: "{{ ruby.versions }}"
+  loop: "{{ ruby.versions }}"
   tags: ruby
 
 - name: "Set {{ ruby.global }} as global version"
@@ -33,14 +33,14 @@
   file:
     dest: "/tmp/rubies/{{ item }}"
     state: directory
-  with_items: "{{ ruby.versions }}"
+  loop: "{{ ruby.versions }}"
   tags: bundler
 
 - name: Setup local ruby versions
   template:
     src: ruby-version.j2
     dest: "/tmp/rubies/{{ item }}/.ruby-version"
-  with_items: "{{ ruby.versions }}"
+  loop: "{{ ruby.versions }}"
   tags: bundler
 
 - name: Install bundler
@@ -49,7 +49,7 @@
     chdir: "/tmp/rubies/{{ item }}"
   environment:
     PATH: "{{ env_path }}"
-  with_items: "{{ ruby.versions }}"
+  loop: "{{ ruby.versions }}"
   notify: rbenv rehash
   check_mode: false
   tags: bundler
